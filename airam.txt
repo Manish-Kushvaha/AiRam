@@ -1,0 +1,196 @@
+// informed Search method *****************
+
+Program :
+import heapq
+
+def a_star_algo(start_node, stop_node):
+    graph_nodes = {
+        'S': [('A', 1), ('G', 10)],
+        'A': [('B', 2), ('C', 1)],
+        'B': [('D', 5)],
+        'C': [('D', 3), ('G', 4)],
+        'D': [('G', 2)],
+        'G': [],
+    }
+
+    # Heuristic function
+    h_dist = {'S': 5, 'A': 3, 'B': 4, 'C': 2, 'D': 6, 'G': 0}
+
+    open_set = []
+    heapq.heappush(open_set, (h_dist[start_node], 0, start_node))  # (f(n), g(n), node)
+
+    g = {start_node: 0}
+    parents = {start_node: None}
+    
+    while open_set:
+        _, current_g, current = heapq.heappop(open_set)
+
+        # If goal is reached, reconstruct the path
+        if current == stop_node:
+            path, node = [], current
+            while node:
+                path.append(node)
+                node = parents[node]
+            path.reverse()
+            print(f"{start_node} is the start node")
+            print(f"{stop_node} is the goal node")
+            print(f"Weight of the path is {g[stop_node]}")
+            print(f"Path found : {path}")
+            return
+        
+        # Exploring neighbors
+        for neighbor, cost in graph_nodes.get(current, []):
+            new_g = g[current] + cost
+            if neighbor not in g or new_g < g[neighbor]:  # Ensure minimum cost is selected
+                g[neighbor] = new_g
+                f = new_g + h_dist[neighbor]
+                heapq.heappush(open_set, (f, new_g, neighbor))
+                parents[neighbor] = current
+
+    print("Path not found")
+
+a_star_algo('S', 'G')
+
+
+
+//Game 8 puzzle *****************************************
+
+import heapq
+
+class PuzzleState:
+    def __init__(self, board, g, h, parent=None):
+        self.board = board
+        self.g = g
+        self.h = h
+        self.parent = parent
+        self.empty_row, self.empty_col = self.find_empty_tile()
+
+    def find_empty_tile(self):
+        for i in range(3):
+            for j in range(3):
+                if self.board[i][j] == 0:
+                    return i, j
+
+    @staticmethod
+    def calculate_heuristic(board, goal):
+        distance = 0
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] != 0:
+                    for x in range(3):
+                        for y in range(3):
+                            if board[i][j] == goal[x][y]:
+                                distance += abs(i - x) + abs(j - y)
+        return distance
+
+    def generate_neighbors(self, goal):
+        neighbors = []
+        row_offsets = [-1, 1, 0, 0]
+        col_offsets = [0, 0, -1, 1]
+
+        for i in range(4):
+            new_row = self.empty_row + row_offsets[i]
+            new_col = self.empty_col + col_offsets[i]
+            if 0 <= new_row < 3 and 0 <= new_col < 3:
+                new_board = [row[:] for row in self.board]
+                new_board[self.empty_row][self.empty_col], new_board[new_row][new_col] = new_board[new_row][new_col], new_board[self.empty_row][self.empty_col]
+                new_h = PuzzleState.calculate_heuristic(new_board, goal)
+                neighbors.append(PuzzleState(new_board, self.g + 1, new_h, self))
+        return neighbors
+
+    def is_goal(self, goal):
+        return self.board == goal
+
+    def print_board(self):
+        for row in self.board:
+            print(' '.join(map(str, row)))
+        print()
+
+    def __lt__(self, other):
+        return (self.g + self.h) < (other.g + other.h)
+
+def solve_puzzle(start, goal):
+    open_set = []
+    closed_set = set()
+    start_h = PuzzleState.calculate_heuristic(start, goal)
+    heapq.heappush(open_set, PuzzleState(start, 0, start_h))
+
+    while open_set:
+        current = heapq.heappop(open_set)
+
+        if current.is_goal(goal):
+            print("Solution found!")
+            print_solution_path(current)
+            return
+
+        closed_set.add(tuple(map(tuple, current.board)))
+
+        for neighbor in current.generate_neighbors(goal):
+            if tuple(map(tuple, neighbor.board)) not in closed_set:
+                heapq.heappush(open_set, neighbor)
+
+    print("No solution found.")
+
+def print_solution_path(state):
+    if state is None:
+        return
+    print_solution_path(state.parent)
+    state.print_board()
+
+if __name__ == "__main__":
+    start = [
+        [1, 2, 3],
+        [4, 0, 5],
+        [7, 8, 6]
+    ]
+
+    goal = [
+        [1, 2, 3],
+        [4, 5, 6],
+        [7, 8, 0]
+    ]
+    solve_puzzle(start, goal)
+
+
+
+
+//Spare tyre problem*****************************************************
+
+
+
+def max_distance(fuel_capacity, fuel_efficiency, tire_weight):
+
+max_distance = 0
+
+# store maximum distance for unit of fuel used
+
+dp[0] (fuel_capacity +1)
+
+for fuel_used in range(1, fuel_capacity + 1):
+
+remaining fuel fuel_capacity fuel_used
+
+distance fuel_used fuel_efficiency
+
+if remaining_fuel >= tire_weight:
+
+distance += (fuel_capacity - remaining_fuel- tire_weight) fuel_efficiency
+
+# Update maximum distance used
+
+dp[fuel_used]=max(dp[fuel_used - 1], distance)
+
+return dp[fuel_capacity]
+
+# example usage
+
+fuel_capacity 10 # max fuel capacity
+
+fuel_efficiency = 20 # miles per gallon
+
+tire_weight=2# weight of spare tire
+
+max_dist = max_distance(fuel_capacity, fuel_efficiency, tire_weight)
+
+print("Maximum distance the spare tire can travel:", max_dist, "miles")
+
