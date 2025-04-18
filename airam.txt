@@ -1,3 +1,43 @@
+// uninformed search bfs dfs
+
+def bfs(graph, start):
+    print("BFS Traversal:")
+    queue = [start]
+    visited = {start}
+    while queue:
+        node = queue.pop(0)
+        print(node, end=" ")
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    print()
+
+def dfs(graph, node, visited=None):
+    if visited is None:
+        visited = set()
+        print("DFS Traversal:")
+    if node in visited:
+        return
+    print(node, end=" ")
+    visited.add(node)
+    for neighbor in graph[node]:
+        dfs(graph, neighbor, visited)
+
+# Example usage:
+g = [
+    [1, 2],
+    [0, 3, 4],
+    [0, 4],
+    [1],
+    [1, 2]
+]
+
+bfs(g, 0)
+dfs(g, 0)
+
+
+
 // informed Search method *****************
 
 Program :
@@ -193,4 +233,6 @@ tire_weight=2# weight of spare tire
 max_dist = max_distance(fuel_capacity, fuel_efficiency, tire_weight)
 
 print("Maximum distance the spare tire can travel:", max_dist, "miles")
+
+
 
